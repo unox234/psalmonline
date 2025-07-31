@@ -1,4 +1,8 @@
-flask
-flask_sqlalchemy
-flask_login
-werkzeug 
+Flask
+Flask_SQLAlchemy
+Flask_Login
+flask_migrate
+Werkzeug
+SQLAlchemy
+itsdangerous
+python-dotenv
