@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liturgiebord</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #222;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            height: 1920px;
+            width: 1080px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .liturgie-board {
+            width: 1080px;
+            height: 1920px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 0.5vh;
+            padding-left: 5vw;
+            position: relative;
+        }
+        .liturgie-line {
+            width: 90vw;
+            text-align: left;
+            font-size: 150px;
+            line-height: 1.1;
+            white-space: pre-wrap;
+          
+            margin: 0;
+            padding: 0;
+            z-index: 2;
+            text-shadow: 2px 2px 8px #000, 0 0 4px #000;
+        }
+        .liturgie-bg-overlay {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div style="transform-origin: top left;">
+      <div class="liturgie-board" {% if board.background_image %}
+        style="background-image: url('{% if board.background_image.startswith('default_') %}{{ url_for('static', filename=board.background_image) }}{% else %}{{ url_for('uploaded_file', filename=board.background_image) }}{% endif %}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+      {% endif %}>
+        {% if board.background_image %}<div class="liturgie-bg-overlay"></div>{% endif %}
+        {% if schedule_content %}
+            {% set lines = schedule_content.split('\n') %}
+            {% for i in range(10) %}
+                <div class="liturgie-line">{{ lines[i] if lines|length > i else ' ' }}</div>
+            {% endfor %}
+        {% else %}
+            <div class="liturgie-line">{{ board.line1 or ' ' }}</div>
+            <div class="liturgie-line">{{ board.line2 or ' ' }}</div>
+            <div class="liturgie-line">{{ board.line3 or ' ' }}</div>
+            <div class="liturgie-line">{{ board.line4 or ' ' }}</div>
+            <div class="liturgie-line">{{ board.line5 or ' ' }}</div>
+            <div class="liturgie-line">{{ board.line6 or ' ' }}</div>
+            <div class="liturgie-line">{{ board.line7 or ' ' }}</div>
+            <div class="liturgie-line">{{ board.line8 or ' ' }}</div>
+            <div class="liturgie-line">{{ board.line9 or ' ' }}</div>
+            <div class="liturgie-line">{{ board.line10 or ' ' }}</div>
+        {% endif %}
+      </div>
+    </div>
+<script>
+// LIVE PREVIEW FEATURE: Accept messages with new data and update the lines/background
+window.addEventListener('message', function(event) {
+  // You may want to restrict this for security: 
+  // if (event.origin !== 'YOUR_DOMAIN') return;
+  var data = event.data;
+  if (!data || typeof data !== 'object' || !data.type || data.type !== 'updateBoard') return;
+
+  // Update all lines
+  for (let i = 1; i <= 10; i++) {
+    var el = document.querySelector('.liturgie-line:nth-child(' + (data.bg ? i+1 : i) + ')');
+    if (el) el.textContent = (data['line'+i] || ' ');
+  }
+  // Update background if sent
+  if ('bg' in data) {
+    document.querySelector('.liturgie-board').style.backgroundImage = data.bg ? ("url('" + data.bg + "')") : 'none';
+    // Show/hide overlay
+    var overlay = document.querySelector('.liturgie-bg-overlay');
+    if (overlay) {
+      overlay.style.display = data.bg ? '' : 'none';
+    }
+  }
+}, false);
+</script>
+<script>
+// Poll every 5 seconds to check for active schedule update
+(function() {
+  let currentLines = [];
+  let currentBackground = null;
+  {% if schedule_content %}
+  currentLines = {{ schedule_content.split('\n')|tojson }};
+  {% else %}
+  currentLines = Array(10).fill(' ');
+  {% endif %}
+
+  const boardId = {{ board.id }};
+
+  function updateBoardFromData(data) {
+    // Use postMessage event format to update lines & background
+    const msg = { type: 'updateBoard' };
+    for (let i = 1; i <= 10; i++) {
+      msg['line'+i] = data.lines[i-1] || ' ';
+    }
+    if (data.background) {
+      msg.bg = data.background;
+    } else {
+      msg.bg = null;
+    }
+    window.postMessage(msg, '*');
+    currentLines = data.lines;
+    currentBackground = data.background || null;
+  }
+
+  async function pollActiveSchedule() {
+    try {
+      const response = await fetch(`/board/${boardId}/active_schedule_json`);
+      if (!response.ok) throw new Error('Network response not ok');
+      const data = await response.json();
+
+      // Compare new lines with current lines
+      let changed = false;
+      for (let i = 0; i < 10; i++) {
+        if ((data.lines[i] || ' ') !== (currentLines[i] || ' ')) {
+          changed = true;
+          break;
+        }
+      }
+
+      // Check for background change
+      if ((data.background || null) !== currentBackground) {
+        changed = true;
+      }
+
+      if (changed) {
+        updateBoardFromData(data);
+      }
+    } catch (e) {
+      console.error('Error polling active schedule:', e);
+    }
+  }
+
+  setInterval(pollActiveSchedule, 5000);
+})();
+</script>
+
+<script>
+// Poll every 5 seconds to check for active schedule update
+(function() {
+  let currentLines = [];
+  {% if schedule_content %}
+  currentLines = {{ schedule_content.split('\n')|tojson }};
+  {% else %}
+  currentLines = Array(10).fill(' ');
+  {% endif %}
+
+  const boardId = {{ board.id }};
+
+  function updateBoardFromData(data) {
+    // Use postMessage event format to update lines & background
+    const msg = { type: 'updateBoard' };
+    for (let i = 1; i <= 10; i++) {
+      msg['line'+i] = data.lines[i-1] || ' ';
+    }
+    if (data.background) {
+      msg.bg = data.background;
+    }
+    window.postMessage(msg, '*');
+    currentLines = data.lines;
+  }
+
+  async function pollActiveSchedule() {
+    try {
+      const response = await fetch(`/board/${boardId}/active_schedule_json`);
+      if (!response.ok) throw new Error('Network response not ok');
+      const data = await response.json();
+
+      // Compare new lines with current lines
+      let changed = false;
+      for (let i = 0; i < 10; i++) {
+        if ((data.lines[i] || ' ') !== (currentLines[i] || ' ')) {
+          changed = true;
+          break;
+        }
+      }
+      // Also consider background change
+      // We can extend this if needed, skipping for now
+
+      if (changed) {
+        updateBoardFromData(data);
+      }
+    } catch (e) {
+      console.error('Error polling active schedule:', e);
+    }
+  }
+
+  setInterval(pollActiveSchedule, 5000);
+})();
+</script>
+</body>
+</html> 

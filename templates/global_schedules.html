@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Globale Planningen{% endblock %}
+
+{% block content %}
+<div class="space-y-8 max-w-6xl mx-auto px-4">
+  <h1 class="text-3xl font-semibold mb-6">Globale planningen</h1>
+  <a href="{{ url_for('add_global_schedule') }}" class="bg-green-600 text-white px-6 py-3 rounded-md font-semibold shadow hover:bg-green-700 inline-block mb-6 transition">Nieuwe planning toevoegen</a>
+  <div class="overflow-x-auto rounded-lg border border-gray-300">
+    <table class="min-w-full divide-y divide-gray-200 bg-white">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Naam</th>
+          <th class="px-6 py-3 text-sm font-semibold text-gray-700 text-center">Datum</th>
+          <th class="px-6 py-3 text-sm font-semibold text-gray-700 text-center">Starttijd</th>
+          <th class="px-6 py-3 text-sm font-semibold text-gray-700 text-center">Eindtijd</th>
+          <th class="px-6 py-3 text-sm font-semibold text-gray-700 text-center">Toegewezen borden</th>
+          <th class="px-6 py-3 text-sm font-semibold text-gray-700 text-center">Acties</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        {% for schedule in schedules %}
+        <tr>
+          <td class="whitespace-nowrap px-6 py-4 text-gray-900">{{ schedule.name }}</td>
+          <td class="px-6 py-4 text-center text-gray-900">{{ schedule.date.strftime('%Y-%m-%d') }}</td>
+          <td class="px-6 py-4 text-center text-gray-900">{{ schedule.start_time.strftime('%H:%M') }}</td>
+          <td class="px-6 py-4 text-center text-gray-900">{{ schedule.end_time.strftime('%H:%M') }}</td>
+          <td class="px-6 py-4 text-center text-gray-900">
+            {% for board in schedule.boards %}{{ board.name }}{% if not loop.last %}, {% endif %}{% endfor %}
+          </td>
+          <td class="px-6 py-4 text-center">
+            <a href="{{ url_for('edit_global_schedule', schedule_id=schedule.id) }}" class="bg-yellow-500 text-white text-xs px-2 py-1 rounded hover:bg-yellow-600 transition">Bewerken</a>
+            <form action="{{ url_for('delete_global_schedule', schedule_id=schedule.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Weet je zeker dat je deze planning wilt verwijderen?');">
+              <button type="submit" class="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700 transition">Verwijderen</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <a href="{{ url_for('portal') }}" class="bg-gray-600 text-white px-6 py-3 rounded-md font-semibold shadow hover:bg-gray-700 inline-block mt-6 transition">Terug naar portal</a>
+</div>
+{% endblock %}

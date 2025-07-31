@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block title %}{% if schedule %}Schema Bijwerken{% else %}Schema Toevoegen{% endif %}{% endblock %}
+{% block content %}
+<style>
+.preview-container {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto 2rem auto;
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+.preview-wrapper {
+  width: 250px;
+  height: 444px;
+  background: #222;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+}
+.liturgie-board {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.6vh;
+  padding-left: 5%;
+  position: relative;
+  z-index: 2;
+}
+.liturgie-line {
+  width: 90%;
+  font-size: 28px;
+  line-height: 1.2;
+  text-shadow: 2px 2px 8px #000, 0 0 4px #000;
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  text-align: left;
+  outline: none;
+  cursor: text;
+  user-select: text;
+}
+.input-section {
+  flex: 1 1 260px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.input-section label {
+  font-weight: 700;
+  color: #374151;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.input-section input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.1);
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.input-section input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 5px #93c5fd;
+}
+.save-button {
+  padding: 0.75rem 1.25rem;
+  background-color: #16a34a;
+  color: white;
+  border-radius: 0.375rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  margin-top: auto;
+}
+.save-button:hover {
+  background-color: #15803d;
+}
+@media (max-width: 767px) {
+  .preview-container {
+    flex-direction: column;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+  .preview-wrapper {
+    width: 200px;
+    height: 355px;
+    margin: 0 auto 1rem auto;
+  }
+  .input-section {
+    min-width: unset;
+  }
+}
+</style>
+
+<h1 class="text-3xl font-bold mb-6 text-center">{% if schedule %}Schema Bijwerken{% else %}Schema Toevoegen{% endif %}</h1>
+<form method="post" id="scheduleForm">
+  <div class="preview-container">
+    <!-- Left: Live preview with editable lines -->
+    <div class="preview-wrapper"
+      style="position: relative; background-image: {% if schedule and schedule.boards_list|length > 0 %}
+        {% set board_bg = schedule.boards_list[0].background_image if schedule.boards_list[0].background_image else None %}
+        {% if board_bg %}
+          url('{% if board_bg.startswith('default_') %}{{ url_for('static', filename=board_bg) }}{% else %}{{ url_for('uploaded_file', filename=board_bg) }}{% endif %}')
+        {% else %}none
+        {% endif %}
+        {% else %}none
+      {% endif %}; background-color:#222; background-size: cover; background-position: center;">
+      <div class="liturgie-bg-overlay" style="
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 1;
+        pointer-events: none;
+      "></div>
+      <div class="liturgie-board" contenteditable="false" style="position: relative; z-index: 2;">
+        {% set lines = schedule.content.split('\n') if schedule and schedule.content else [' ']*10 %}
+        {% for i in range(10) %}
+        <div class="liturgie-line" contenteditable="true" data-line="line{{ i+1 }}" spellcheck="false">{{ lines[i] if i < lines|length else ' ' }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Right: Input fields for schedule name, date, time, board assignment, and save button -->
+    <div class="input-section">
+      <label for="name">Naam:</label>
+      <input type="text" id="name" name="name" required value="{{ schedule.name if schedule else '' }}">
+
+      <label for="date">Datum:</label>
+      <input type="date" id="date" name="date" required value="{{ schedule.date.strftime('%Y-%m-%d') if schedule and schedule.date else '' }}">
+
+      <label for="start_time">Starttijd:</label>
+      <input type="time" id="start_time" name="start_time" required value="{{ schedule.start_time.strftime('%H:%M') if schedule and schedule.start_time else '' }}">
+
+      <label for="end_time">Eindtijd:</label>
+      <input type="time" id="end_time" name="end_time" required value="{{ schedule.end_time.strftime('%H:%M') if schedule and schedule.end_time else '' }}">
+
+      <label>Toegewezen borden:</label>
+      <div class="overflow-hidden rounded-lg max-h-56 overflow-y-auto mb-6 border border-gray-200">
+        <table class="min-w-full divide-y divide-gray-200 border-collapse">
+          <thead class="bg-gray-50">
+            <tr class="divide-x divide-gray-200">
+              <th scope="col" class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Naam</th>
+              <th scope="col" class="px-4 py-3.5 text-center text-sm font-semibold text-gray-900">Toewijzen</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 bg-white">
+            {% for board in boards %}
+            <tr class="divide-x divide-gray-200 hover:bg-gray-50 cursor-pointer">
+              <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-semibold text-gray-900 sm:pl-6">{{ board.name }}</td>
+              <td class="whitespace-nowrap px-4 py-4 text-center text-sm font-semibold text-gray-900 flex justify-center items-center">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" value="{{ board.id }}" name="boards" class="sr-only peer" {% if schedule and board in schedule.boards_list %}checked{% endif %}>
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:bg-blue-600 transition-all duration-300"></div>
+                  <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-5"></div>
+                </label>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <button type="submit" class="save-button">Opslaan</button>
+    </div>
+  </div>
+
+  <!-- Hidden inputs to store lines for form submission -->
+  {% for i in range(1, 11) %}
+  <input type="hidden" name="line{{ i }}" id="hidden-line{{ i }}" value="">
+  {% endfor %}
+</form>
+
+<script>
+document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+  // Copy content from editable divs to hidden inputs
+  for (let i = 1; i <= 10; i++) {
+    let div = document.querySelector('.liturgie-line[data-line="line' + i + '"]');
+    let hiddenInput = document.getElementById('hidden-line' + i);
+    if (div && hiddenInput) {
+      hiddenInput.value = div.textContent.trim() || ' ';
+    }
+  }
+});
+// Optional: keyboard navigation and basic shortcuts could be added here
+</script>
+
+{% endblock %}

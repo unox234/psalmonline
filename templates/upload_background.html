@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Achtergrondafbeelding wijzigen - Digitale Liturgie{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto">
+  <h2 class="text-3xl font-semibold mb-6">Achtergrondafbeelding wijzigen voor: {{ board.name }}</h2>
+  <div class="flex space-x-8">
+    <form method="post" enctype="multipart/form-data" class="space-y-6 flex-1">
+      <div>
+        <label for="background" class="block mb-2 font-semibold text-gray-700">Kies een afbeelding</label>
+        <input type="file" id="background" name="background" accept="image/*" required class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+      </div>
+      <button type="submit" class="bg-blue-600 text-white w-full rounded-md py-3 font-semibold shadow hover:bg-blue-700 transition">Uploaden</button>
+      <a href="{{ url_for('edit_board', board_id=board.id) }}" class="block text-center bg-gray-400 text-white rounded-md py-3 mt-2 font-semibold shadow hover:bg-gray-500 transition">Annuleren</a>
+    </form>
+    {% if board.background_image %}
+    <div class="flex-1">
+      <p class="mb-2">Huidige achtergrond:</p>
+      <img src="{{ url_for('uploaded_file', filename=board.background_image) }}" alt="Achtergrond" class="rounded-lg max-w-full max-h-72 object-contain">
+    </div>
+    {% endif %}
+  </div>
+  <div class="mt-10">
+    <h3 class="text-xl font-semibold mb-4">Kies een standaard achtergrond:</h3>
+    <div class="grid grid-cols-4 gap-4">
+      <form method="post" class="inline-block">
+        <input type="hidden" name="default_background" value="default_wall_1.jpg">
+        <img src="/static/default_wall_1.jpg" alt="Standaard achtergrond 1" class="cursor-pointer rounded-lg border border-gray-300 hover:border-blue-600 transition" onclick="this.closest('form').submit()">
+      </form>
+      <form method="post" class="inline-block">
+        <input type="hidden" name="default_background" value="default_wall_2.jpg">
+        <img src="/static/default_wall_2.jpg" alt="Standaard achtergrond 2" class="cursor-pointer rounded-lg border border-gray-300 hover:border-blue-600 transition" onclick="this.closest('form').submit()">
+      </form>
+      <form method="post" class="inline-block">
+        <input type="hidden" name="default_background" value="default_wall_3.jpg">
+        <img src="/static/default_wall_3.jpg" alt="Standaard achtergrond 3" class="cursor-pointer rounded-lg border border-gray-300 hover:border-blue-600 transition" onclick="this.closest('form').submit()">
+      </form>
+      <form method="post" class="inline-block">
+        <input type="hidden" name="default_background" value="default_wall_4.jpg">
+        <img src="/static/default_wall_4.jpg" alt="Standaard achtergrond 4" class="cursor-pointer rounded-lg border border-gray-300 hover:border-blue-600 transition" onclick="this.closest('form').submit()">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Kerk Instellingen{% endblock %}
+{% block content %}
+  <div class="space-y-8 max-w-5xl mx-auto">
+    <h2 class="text-3xl font-semibold mb-6">Kerk Instellingen</h2>
+    {% if msg %}
+    <div class="bg-blue-100 border border-blue-400 text-blue-700 px-6 py-4 rounded mb-6">{{ msg }}</div>
+    {% endif %}
+    <div class="flex flex-wrap gap-10">
+      <form method="post" class="flex-1 min-w-[300px] max-w-lg space-y-4" enctype="multipart/form-data">
+        <input type="hidden" name="form_type" value="contact">
+        <h3 class="text-2xl font-semibold">Kerkgegevens</h3>
+        <div>
+          <label for="name" class="block mb-2 font-semibold text-gray-700">Kerknaam</label>
+          <input type="text" id="name" name="name" value="{{ church.name }}" class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+        </div>
+        <div>
+          <label for="contact_email" class="block mb-2 font-semibold text-gray-700">Contact Email</label>
+          <input type="email" id="contact_email" name="contact_email" value="{{ church.contact_email }}" class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+        </div>
+        <div>
+          <label for="contact_phone" class="block mb-2 font-semibold text-gray-700">Telefoon</label>
+          <input type="text" id="contact_phone" name="contact_phone" value="{{ church.contact_phone }}" class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+        </div>
+        <div>
+          <label for="contact_address" class="block mb-2 font-semibold text-gray-700">Adres</label>
+          <input type="text" id="contact_address" name="contact_address" value="{{ church.contact_address }}" class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+        </div>
+        <div>
+          <label for="logo" class="block mb-2 font-semibold text-gray-700">Logo uploaden</label>
+          <input type="file" id="logo" name="logo" accept="image/png, image/jpeg, image/jpg, image/gif" class="w-full border border-gray-300 rounded-md p-2">
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded font-semibold shadow hover:bg-blue-700 transition">Opslaan</button>
+      </form>
+      <div class="flex-1 min-w-[300px] max-w-md">
+        <h3 class="text-2xl font-semibold mb-4">Gebruikers van deze kerk</h3>
+        <div class="overflow-x-auto rounded-lg border border-gray-300 mb-6">
+          <table class="min-w-full divide-y divide-gray-200 bg-white">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Gebruikersnaam</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              {% for user in users %}
+              <tr>
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900 flex items-center justify-between">
+                  {{ user.username }}
+                  {% if user.id != current_user.id %}
+                  <form method="post" action="{{ url_for('church_delete_user', user_id=user.id) }}" onsubmit="return confirm('Weet je zeker dat je deze gebruiker wilt verwijderen?');">
+                    <button type="submit" class="text-red-600 hover:text-red-900 font-semibold ml-4">Verwijderen</button>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <h3 class="text-2xl font-semibold mb-4">Nieuwe gebruiker toevoegen aan deze kerk</h3>
+        <form method="post" class="space-y-4" >
+          <input type="hidden" name="form_type" value="user">
+          <div>
+            <label for="username" class="block mb-2 font-semibold text-gray-700">Emailadres</label>
+            <input type="email" id="username" name="username" placeholder="email@voorbeeld.com" class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+          </div>
+          <div>
+            <label for="password" class="block mb-2 font-semibold text-gray-700">Wachtwoord</label>
+            <input type="password" id="password" name="password" class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+          </div>
+          <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded font-semibold shadow hover:bg-green-700 transition">Toevoegen</button>
+        </form>
+      </div>
+    </div>
+
+    <a href="{{ url_for('portal') }}" class="bg-gray-400 text-white px-6 py-2 rounded font-semibold shadow hover:bg-gray-500 transition inline-block">Terug naar portal</a>
+  </div>
+{% endblock %}
