@@ -677,4 +677,4 @@ if __name__ == '__main__':
                 admin_user = User(username='admin', password=generate_password_hash('admin'), church_id=admin_church.id, is_admin=True)
                 db.session.add(admin_user)
                 db.session.commit()
-    app.run(debug=True)
+    app.run(host='0.0.0.0')

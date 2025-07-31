@@ -5,7 +5,6 @@
 {% block content %}
 <div class="space-y-8 max-w-6xl mx-auto px-4">
   <h1 class="text-3xl font-semibold mb-6">Globale planningen</h1>
-  <a href="{{ url_for('add_global_schedule') }}" class="bg-green-600 text-white px-6 py-3 rounded-md font-semibold shadow hover:bg-green-700 inline-block mb-6 transition">Nieuwe planning toevoegen</a>
   <div class="overflow-x-auto rounded-lg border border-gray-300">
     <table class="min-w-full divide-y divide-gray-200 bg-white">
       <thead class="bg-gray-100">
@@ -39,6 +38,6 @@
       </tbody>
     </table>
   </div>
-  <a href="{{ url_for('portal') }}" class="bg-gray-600 text-white px-6 py-3 rounded-md font-semibold shadow hover:bg-gray-700 inline-block mt-6 transition">Terug naar portal</a>
+  <a href="{{ url_for('add_global_schedule') }}" class="bg-green-600 text-white px-6 py-3 rounded-md font-semibold shadow hover:bg-green-700 inline-block mb-6 transition">Nieuwe planning toevoegen</a>
 </div>
 {% endblock %}
