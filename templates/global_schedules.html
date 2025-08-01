@@ -28,9 +28,9 @@
             {% for board in schedule.boards %}{{ board.name }}{% if not loop.last %}, {% endif %}{% endfor %}
           </td>
           <td class="px-6 py-4 text-center">
-            <a href="{{ url_for('edit_global_schedule', schedule_id=schedule.id) }}" class="bg-yellow-500 text-white text-xs px-2 py-1 rounded hover:bg-yellow-600 transition">Bewerken</a>
+            <a href="{{ url_for('edit_global_schedule', schedule_id=schedule.id) }}" class="bg-[#f7d91a] text-black text-xs px-6 py-3 rounded font-semibold hover:bg-yellow-300 transition">Bewerken</a>
             <form action="{{ url_for('delete_global_schedule', schedule_id=schedule.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Weet je zeker dat je deze planning wilt verwijderen?');">
-              <button type="submit" class="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700 transition">Verwijderen</button>
+              <button type="submit" class="bg-red-600 text-white text-xs px-6 py-3 rounded font-semibold hover:bg-red-700 transition">Verwijderen</button>
             </form>
           </td>
         </tr>
@@ -38,6 +38,6 @@
       </tbody>
     </table>
   </div>
-  <a href="{{ url_for('add_global_schedule') }}" class="bg-green-600 text-white px-6 py-3 rounded-md font-semibold shadow hover:bg-green-700 inline-block mb-6 transition">Nieuwe planning toevoegen</a>
+  <a href="{{ url_for('add_global_schedule') }}" class="bg-[#f7d91a] text-black px-6 py-3 rounded-md font-semibold shadow hover:bg-yellow-300 inline-block mb-6 transition">Nieuwe planning toevoegen</a>
 </div>
 {% endblock %}

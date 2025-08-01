@@ -1,17 +1,27 @@
 {% extends 'base.html' %}
+
 {% block title %}Nieuw Liturgiebord Toevoegen - Digitale Liturgie{% endblock %}
+
 {% block content %}
-<div class="space-y-6 max-w-2xl">
-  <h2 class="text-3xl font-semibold leading-tight">Nieuw Liturgiebord Toevoegen</h2>
-  <form method="post" class="space-y-5">
+
+<div class="space-y-8 max-w-6xl mx-auto px-4">
+
+  <h2 class="text-3xl font-semibold mb-6">Nieuw Liturgiebord Toevoegen</h2>
+
+  <form method="post" class="space-y-6 max-w-xl">
+
       <div>
-          <label for="name" class="block mb-2 font-semibold text-gray-700">Naam van het bord</label>
-          <input type="text" id="name" name="name" required class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+          <label for="name" class="block mb-3 font-semibold text-gray-700">Naam van het bord</label>
+          <input type="text" id="name" name="name" required class="w-full rounded-md border border-gray-300 p-4 text-lg placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
       </div>
-      <div class="flex gap-3">
-        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-md font-semibold shadow hover:bg-green-700 transition">Toevoegen</button>
-        <a href="{{ url_for('portal') }}" class="bg-gray-400 text-white px-6 py-2 rounded-md font-semibold shadow hover:bg-gray-500 transition">Annuleren</a>
+
+      <div class="flex gap-4">
+        <button type="submit" class="bg-[#f7d91a] text-black px-8 py-3 rounded-md font-semibold shadow hover:bg-yellow-300 transition">Toevoegen</button>
+        <a href="{{ url_for('portal') }}" class="bg-white text-black border border-black px-8 py-3 rounded-md font-semibold shadow hover:bg-gray-100 transition">Annuleren</a>
       </div>
+
   </form>
+
 </div>
+
 {% endblock %}

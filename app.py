@@ -82,8 +82,12 @@ class Schedule(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+from flask_login import current_user
+
 @app.route('/')
 def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('portal'))
     return render_template('index.html')
 
 # --- Church Settings Route ---
@@ -105,7 +109,15 @@ def church_settings():
         if 'logo' in request.files:
             logo = request.files['logo']
             if logo and allowed_file(logo.filename):
-                filename = secure_filename(f'church_{church.id}_logo_{logo.filename}')
+                # Remove old logo file if exists
+                if church.logo_filename:
+                    old_filepath = os.path.join(app.config['UPLOAD_FOLDER'], church.logo_filename)
+                    if os.path.exists(old_filepath):
+                        os.remove(old_filepath)
+
+                # Create a unique filename
+                import time
+                filename = secure_filename(f'church_{church.id}_logo_{int(time.time())}_{logo.filename}')
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 logo.save(filepath)
                 church.logo_filename = filename

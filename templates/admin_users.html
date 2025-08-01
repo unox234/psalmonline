@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
+
 {% block title %}Gebruikersbeheer - Digitale Liturgie{% endblock %}
+
 {% block content %}
-<div class="space-y-8 max-w-5xl">
+
+<div class="space-y-8 max-w-6xl mx-auto px-4">
+
   <h2 class="text-3xl font-semibold mb-6">Gebruikersbeheer</h2>
+
   <div class="overflow-x-auto rounded-lg border border-gray-300">
     <table class="min-w-full divide-y divide-gray-200 bg-white">
       <thead class="bg-gray-100">
@@ -22,13 +27,13 @@
           <td class="px-6 py-4 text-sm text-gray-900">{% if user.is_admin %}Ja{% else %}Nee{% endif %}</td>
           <td class="text-center px-6 py-4">
             {% if not user.is_admin %}
-            <a href="{{ url_for('admin_impersonate', user_id=user.id) }}" class="bg-blue-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700 transition">Impersonate</a>
+            <a href="{{ url_for('admin_impersonate', user_id=user.id) }}" class="bg-[#f7d91a] text-black text-xs px-6 py-3 rounded font-semibold hover:bg-yellow-300 transition">Impersonate</a>
             {% else %}-{% endif %}
           </td>
           <td class="text-center px-6 py-4">
             {% if not user.is_admin %}
             <form action="{{ url_for('admin_delete_user', user_id=user.id) }}" method="post" style="display:inline;" onsubmit="return confirm('Weet je zeker dat je deze gebruiker en alle bijbehorende kerkdata wilt verwijderen?');">
-              <button type="submit" class="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700 transition">Verwijderen</button>
+              <button type="submit" class="bg-red-600 text-white text-xs px-6 py-3 rounded font-semibold hover:bg-red-700 transition">Verwijderen</button>
             </form>
             {% else %}-{% endif %}
           </td>
@@ -37,6 +42,9 @@
       </tbody>
     </table>
   </div>
-  <a href="{{ url_for('admin_dashboard') }}" class="bg-gray-400 text-white px-6 py-2 rounded font-semibold shadow hover:bg-gray-500 transition inline-block mt-6">Terug naar dashboard</a>
+
+  <a href="{{ url_for('admin_dashboard') }}" class="bg-white text-black border border-black px-6 py-3 rounded-md font-semibold shadow hover:bg-gray-100 transition inline-block mt-6">Terug naar dashboard</a>
+
 </div>
-{% endblock %} 
+
+{% endblock %}

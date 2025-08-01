@@ -1,22 +1,32 @@
 {% extends 'base.html' %}
+
 {% block title %}Register - Digitale Liturgie{% endblock %}
+
 {% block content %}
-<div class="space-y-8 max-w-md mx-auto">
-  <h2 class="text-3xl font-semibold tracking-tight">Register</h2>
-  <form method="post" class="space-y-6">
-    <div>
-      <label for="username" class="block mb-2 font-semibold text-gray-700">Emailadres</label>
-      <input type="email" id="username" name="username" required class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
-    </div>
-    <div>
-      <label for="password" class="block mb-2 font-semibold text-gray-700">Wachtwoord</label>
-      <input type="password" id="password" name="password" required class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
-    </div>
-    <div>
-      <label for="church" class="block mb-2 font-semibold text-gray-700">Kerk</label>
-      <input type="text" id="church" name="church" placeholder="Kies of maak een kerk" required class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
-    </div>
-    <button type="submit" class="bg-blue-600 text-white w-full rounded-md py-3 font-semibold shadow hover:bg-blue-700 transition">Register</button>
-  </form>
+
+<div class="space-y-8 max-w-6xl mx-auto px-4">
+  <div class="max-w-md mx-auto">
+    <h2 class="text-3xl font-semibold mb-6">Register</h2>
+
+    <form method="post" class="space-y-6">
+      <div>
+        <label for="username" class="block mb-3 font-semibold text-gray-700">Emailadres</label>
+        <input type="email" id="username" name="username" required class="w-full rounded-md border border-gray-300 p-4 text-lg placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+      </div>
+
+      <div>
+        <label for="password" class="block mb-3 font-semibold text-gray-700">Wachtwoord</label>
+        <input type="password" id="password" name="password" required class="w-full rounded-md border border-gray-300 p-4 text-lg placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+      </div>
+
+      <div>
+        <label for="church" class="block mb-3 font-semibold text-gray-700">Kerk</label>
+        <input type="text" id="church" name="church" placeholder="Kies of maak een kerk" required class="w-full rounded-md border border-gray-300 p-4 text-lg placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
+      </div>
+
+      <button type="submit" class="bg-[#f7d91a] text-black w-full rounded-md py-4 font-semibold shadow hover:bg-yellow-300 transition">Register</button>
+    </form>
+  </div>
 </div>
+
 {% endblock %}

@@ -40,7 +40,9 @@
   font-size: 28px;
   line-height: 1.2;
   text-shadow: 2px 2px 8px #000, 0 0 4px #000;
-  white-space: pre-wrap;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   margin: 0;
   padding: 0;
   color: #fff;
@@ -48,6 +50,24 @@
   outline: none;
   cursor: text;
   user-select: text;
+}
+
+/* Highlight for drag-over between lines in preview */
+.liturgie-line.line-over {
+  background: rgba(255,255,255,0.22);
+  border: 2px dashed #fff;
+  box-sizing: border-box;
+  outline: none;
+  transition: background 0.12s, border 0.12s;
+}
+
+.liturgie-line.swap-animate {
+  animation: swap-pulse 0.35s;
+}
+@keyframes swap-pulse {
+  0%   { background: #ffe066; }
+  60%  { background: #fff3cd; }
+  100% { background: none; }
 }
 .input-section {
   flex: 1 1 260px;
@@ -111,8 +131,7 @@
 <form method="post" id="scheduleForm">
   <div class="preview-container">
     <!-- Left: Live preview with editable lines -->
-    <div class="preview-wrapper"
-      style="position: relative; background-image: {% if schedule and schedule.boards_list|length > 0 %}
+    <div class="preview-wrapper" style="font-family: 'Lora', serif; position: relative; background-image: {% if schedule and schedule.boards_list|length > 0 %}
         {% set board_bg = schedule.boards_list[0].background_image if schedule.boards_list[0].background_image else None %}
         {% if board_bg %}
           url('{% if board_bg.startswith('default_') %}{{ url_for('static', filename=board_bg) }}{% else %}{{ url_for('uploaded_file', filename=board_bg) }}{% endif %}')
@@ -131,7 +150,7 @@
         z-index: 1;
         pointer-events: none;
       "></div>
-      <div class="liturgie-board" contenteditable="false" style="position: relative; z-index: 2;">
+      <div class="liturgie-board" contenteditable="false" style="position: relative; z-index: 2; font-family: 'Lora', serif;">
         {% set lines = schedule.content.split('\n') if schedule and schedule.content else [' ']*10 %}
         {% for i in range(10) %}
         <div class="liturgie-line" contenteditable="true" data-line="line{{ i+1 }}" spellcheck="false">{{ lines[i] if i < lines|length else ' ' }}</div>
@@ -179,7 +198,7 @@
         </table>
       </div>
 
-      <button type="submit" class="save-button">Opslaan</button>
+      <button type="submit" class="bg-[#f7d91a] text-black px-8 py-3 rounded font-semibold hover:bg-yellow-300 transition">Opslaan</button>
     </div>
   </div>
 
@@ -190,6 +209,50 @@
 </form>
 
 <script>
+// --- Line drag-and-swap logic ---
+document.addEventListener('DOMContentLoaded', function () {
+  let dragSrc = null;
+  const lines = document.querySelectorAll('.liturgie-line[data-line]');
+  lines.forEach(line => {
+    line.addEventListener('dragstart', function (e) {
+      dragSrc = this;
+      this.classList.add('dragging');
+    });
+    line.addEventListener('dragend', function (e) {
+      this.classList.remove('dragging');
+      dragSrc = null;
+      lines.forEach(l => l.classList.remove('line-over'));
+    });
+    line.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      if (this !== dragSrc) this.classList.add('line-over');
+    });
+    line.addEventListener('dragleave', function (e) {
+      this.classList.remove('line-over');
+    });
+    line.addEventListener('drop', function (e) {
+      e.preventDefault();
+      this.classList.remove('line-over');
+      if (dragSrc && dragSrc !== this) {
+        // Only swap textContent, not the whole element
+        const tmp = this.textContent;
+        this.textContent = dragSrc.textContent;
+        dragSrc.textContent = tmp;
+        // animation for both lines
+        this.classList.add('swap-animate');
+        dragSrc.classList.add('swap-animate');
+        setTimeout(() => {
+          this.classList.remove('swap-animate');
+          dragSrc.classList.remove('swap-animate');
+        }, 400);
+      }
+    });
+    // Make lines draggable
+    line.setAttribute('draggable', 'true');
+  });
+});
+// --- End drag-and-swap logic ---
+
 document.getElementById('scheduleForm').addEventListener('submit', function(e) {
   // Copy content from editable divs to hidden inputs
   for (let i = 1; i <= 10; i++) {

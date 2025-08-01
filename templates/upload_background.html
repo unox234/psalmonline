@@ -9,8 +9,8 @@
         <label for="background" class="block mb-2 font-semibold text-gray-700">Kies een afbeelding</label>
         <input type="file" id="background" name="background" accept="image/*" required class="w-full rounded-md border border-gray-300 p-3 text-base placeholder-gray-400 shadow-sm focus:border-blue-600 focus:ring focus:ring-blue-300 focus:ring-opacity-50 transition">
       </div>
-      <button type="submit" class="bg-blue-600 text-white w-full rounded-md py-3 font-semibold shadow hover:bg-blue-700 transition">Uploaden</button>
-      <a href="{{ url_for('edit_board', board_id=board.id) }}" class="block text-center bg-gray-400 text-white rounded-md py-3 mt-2 font-semibold shadow hover:bg-gray-500 transition">Annuleren</a>
+      <button type="submit" class="bg-[#f7d91a] text-black w-full rounded-md py-3 font-semibold shadow hover:bg-yellow-300 transition">Uploaden</button>
+      <a href="{{ url_for('edit_board', board_id=board.id) }}" class="block text-center bg-white text-black border border-black rounded-md py-3 mt-2 font-semibold shadow hover:bg-gray-100 transition w-full">Annuleren</a>
     </form>
     {% if board.background_image %}
     <div class="flex-1">
